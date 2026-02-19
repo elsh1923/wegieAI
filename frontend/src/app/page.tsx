@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileUpload } from '@/components/FileUpload';
+import { FileUpload } from '../components/FileUpload';
 import { 
   Download, 
   CheckCircle2, 
@@ -34,12 +34,13 @@ export default function Home() {
 
   // Polling for job status
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: any;
 
     if (currentJob && (status === 'processing' || status === 'uploading')) {
+      const jobId = currentJob.job_id;
       interval = setInterval(async () => {
         try {
-          const response = await axios.get(`${API_BASE_URL}/status/${currentJob.job_id}`);
+          const response = await axios.get(`${API_BASE_URL}/status/${jobId}`);
           const data = response.data;
           
           setDetailStatus(data.status.replace('_', ' '));
