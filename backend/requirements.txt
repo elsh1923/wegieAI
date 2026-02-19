@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+moviepy
+openai-whisper
+srt
+pydantic
+torch
+torchvision
+torchaudio
