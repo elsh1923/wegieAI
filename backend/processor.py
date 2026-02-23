@@ -1,9 +1,16 @@
 import os
 import sys
-import whisper
 import srt
 import shutil
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
 from datetime import timedelta
+
+# Load API key
+load_dotenv()
+api_key = os.environ.get("GOOGLE_API_KEY")
+client = genai.Client(api_key=api_key) if api_key else genai.Client()
 
 # --- Configure ffmpeg path before everything else ---
 import imageio_ffmpeg
@@ -34,8 +41,26 @@ os.environ["FFMPEG_BINARY"] = _target_ffmpeg
 from moviepy import VideoFileClip, CompositeVideoClip, TextClip
 from state import jobs, UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR
 
-# Load whisper 'small' model for significantly better Amharic accuracy
-model = whisper.load_model("small")
+# Using Gemini 1.5 Flash for accurate Amharic transcription and translation prevention
+generation_config = types.GenerateContentConfig(
+  temperature=0.0,
+  top_p=0.95,
+  top_k=40,
+  max_output_tokens=8192,
+  response_mime_type="text/plain",
+  system_instruction="""
+  You are an Amharic language expert. Your ONLY job is to listen to the audio and transcribe the spoken Amharic language directly into the Ge'ez script (አማርኛ ፊደል).
+  
+  CRITICAL RULES:
+  1. The output MUST be entirely in the Ge'ez script. Example: ሰላም እንዴት ነህ
+  2. You are FORBIDDEN from using Arabic, Urdu, or Persian characters (e.g. سلام اندیٹ نیہ).
+  3. You are FORBIDDEN from using the Latin alphabet (e.g. Selam indet neh).
+  4. DO NOT translate the Amharic into English.
+  
+  Format the output as a valid SRT file (with counter, timestamp, and text). Make sure the timestamps are accurate to the audio.
+  """
+)
+
 
 def process_video(job_id: str, input_path: str, overlay: bool = False):
     video = None
@@ -48,30 +73,36 @@ def process_video(job_id: str, input_path: str, overlay: bool = False):
         video = VideoFileClip(input_path)
         video.audio.write_audiofile(audio_path)
         
-        # 3. Transcribe
+        # 3. Upload to Gemini and Transcribe
         jobs[job_id]["status"] = "transcribing"
-        print(f"DEBUG: Starting Whisper transcription for job {job_id}")
-        # Disable verbose=True to prevent internal whisper prints that might fail on Windows console
-        # Adding an Amharic initial_prompt heavily reduces the model hallucinating English translations
-        result = model.transcribe(audio_path, language="am", task="transcribe", initial_prompt="እነሆ የአማርኛ ጽሑፍ: ", verbose=False)
+        print(f"DEBUG: Uploading audio to Gemini for job {job_id}")
+        
+        audio_file = client.files.upload(file=audio_path, mime_type="audio/mp3")
+        
+        print(f"DEBUG: Starting Gemini transcription for job {job_id}")
+        
+        prompt = "Transcribe the audio."
+        
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[audio_file, prompt],
+            config=generation_config
+        )
         print(f"DEBUG: Transcription completed for job {job_id}")
         
-        # 4. Generate SRT
+        srt_content = response.text.strip()
+        
+        # Clean up the file from Google's servers
+        client.files.delete(name=audio_file.name)
+        
+        # 4. Save SRT
         jobs[job_id]["status"] = "generating_srt"
-        segments = result.get("segments", [])
-        srt_subtitles = []
-        
-        for i, segment in enumerate(segments):
-            start = timedelta(seconds=segment['start'])
-            end = timedelta(seconds=segment['end'])
-            content = segment['text'].strip()
-            
-            subtitle = srt.Subtitle(index=i+1, start=start, end=end, content=content)
-            srt_subtitles.append(subtitle)
-        
         srt_path = os.path.join(CAPTION_DIR, f"{job_id}.srt")
         with open(srt_path, "w", encoding="utf-8") as f:
-            f.write(srt.compose(srt_subtitles))
+            f.write(srt_content)
+            
+        # Parse the custom SRT back into objects for the MoviePy overlay loop below
+        srt_subtitles = list(srt.parse(srt_content))
         
         # 4.5 Optional Overlay
         if overlay:
