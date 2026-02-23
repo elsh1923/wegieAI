@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import processor
+from state import jobs, UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR
 
 app = FastAPI(title="Amharic Video Captioning API")
 
@@ -17,18 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# In-memory storage for processing status (Use Redis/DB for production)
-jobs: Dict[str, Dict] = {}
-
-UPLOAD_DIR = "uploads"
-AUDIO_DIR = "audio"
-CAPTION_DIR = "captions"
-OUTPUT_DIR = "output"
-
-# Ensure directories exist (they were created by user, but good to check)
-for d in [UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR]:
-    os.makedirs(d, exist_ok=True)
 
 @app.post("/upload")
 async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = File(...), overlay: bool = False):
@@ -59,7 +48,14 @@ async def get_status(job_id: str):
 async def download_srt(job_id: str):
     path = os.path.join(CAPTION_DIR, f"{job_id}.srt")
     if os.path.exists(path):
-        return FileResponse(path, filename=f"{jobs[job_id]['filename']}.srt")
+        original_filename = jobs[job_id]['filename']
+        # Remove original extension (like .mp4) to avoid double extensions like .mp4.srt
+        base_name = os.path.splitext(original_filename)[0]
+        return FileResponse(
+            path, 
+            filename=f"{base_name}.srt",
+            media_type="text/plain"
+        )
     raise HTTPException(status_code=404, detail="SRT not found")
 
 @app.get("/download/video/{job_id}")

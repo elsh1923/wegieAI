@@ -6,13 +6,14 @@ venv/
 .env
 
 # Project specific
-backend/uploads/
-backend/audio/
-backend/captions/
-backend/output/
-backend/*.mp3
-backend/*.srt
-backend/*.mp4
+uploads/
+audio/
+captions/
+output/
+*.mp3
+*.srt
+*.mp4
+server_log.txt
 
 # OS
 .DS_Store

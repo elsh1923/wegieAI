@@ -43,10 +43,15 @@ export default function Home() {
           const response = await axios.get(`${API_BASE_URL}/status/${jobId}`);
           const data = response.data;
           
-          setDetailStatus(data.status.replace('_', ' '));
+          if (data && data.status) {
+            setDetailStatus(String(data.status).replace('_', ' '));
+          }
 
           if (data.status === 'completed') {
             setStatus('completed');
+            // Auto-trigger SRT download
+            const downloadUrl = `${API_BASE_URL}/download/srt/${jobId}`;
+            window.location.href = downloadUrl;
             clearInterval(interval);
           } else if (data.status === 'failed') {
             setStatus('failed');
@@ -72,9 +77,7 @@ export default function Home() {
     formData.append('file', file);
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/upload?overlay=${overlay}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await axios.post(`${API_BASE_URL}/upload?overlay=${overlay}`, formData);
       
       setCurrentJob({
         job_id: response.data.job_id,
@@ -167,62 +170,62 @@ export default function Home() {
               className="glass rounded-[2rem] p-10 border border-white/10 glow space-y-10"
             >
               <div className="flex items-center justify-between">
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <div className="flex items-center space-x-3 text-green-400">
-                    <CheckCircle2 className="w-6 h-6" />
-                    <h2 className="text-2xl font-bold">Processing Complete</h2>
+                    <CheckCircle2 className="w-8 h-8" />
+                    <h2 className="text-3xl font-bold">SRT Ready</h2>
                   </div>
-                  <p className="text-white/40">Your Amharic captions are ready for download.</p>
+                  <p className="text-white/60 text-lg">Your Amharic subtitle file has been generated and download should start automatically.</p>
                 </div>
                 <button 
                   onClick={reset}
-                  className="text-white/40 hover:text-white text-sm font-medium transition-colors"
+                  className="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-2xl text-white/60 hover:text-white text-sm font-medium transition-all"
                 >
-                  Clear Results
+                  New File
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Download SRT */}
-                <a
-                  href={`${API_BASE_URL}/download/srt/${currentJob?.job_id}`}
-                  className="group block p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-accent/30 hover:bg-accent/5 transition-all duration-500"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-4">
-                      <div className="p-3 rounded-2xl bg-white/5 group-hover:bg-accent/20 transition-colors">
-                        <FileType className="w-6 h-6 text-accent" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-lg text-white">Subtitle File</p>
-                        <p className="text-sm text-white/30">Download as .SRT</p>
-                      </div>
-                    </div>
-                    <Download className="w-5 h-5 text-white/20 group-hover:text-accent transition-colors" />
-                  </div>
-                </a>
-
-                {/* Download Video (Optional) */}
-                {currentJob?.overlay && (
+              {currentJob && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Download SRT Button (Primary) */}
                   <a
-                    href={`${API_BASE_URL}/download/video/${currentJob?.job_id}`}
-                    className="group block p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-accent/30 hover:bg-accent/5 transition-all duration-500"
+                    href={`${API_BASE_URL}/download/srt/${currentJob.job_id}`}
+                    className="group block p-8 rounded-[2.5rem] bg-accent/10 border-2 border-accent/20 hover:border-accent/40 hover:bg-accent/20 transition-all duration-500 shadow-2xl shadow-accent/10"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-4">
-                        <div className="p-3 rounded-2xl bg-white/5 group-hover:bg-accent/20 transition-colors">
-                          <Video className="w-6 h-6 text-accent" />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-6">
+                        <div className="p-4 rounded-3xl bg-accent/20 group-hover:bg-accent group-hover:scale-110 transition-all duration-500">
+                          <FileType className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <p className="font-bold text-lg text-white">Captioned Video</p>
-                          <p className="text-sm text-white/30">Download MP4 with Overlay</p>
+                          <p className="font-bold text-2xl text-white">Download SRT</p>
+                          <p className="text-white/40 uppercase tracking-widest text-xs mt-1">UTF-8 Encoded</p>
                         </div>
                       </div>
-                      <Download className="w-5 h-5 text-white/20 group-hover:text-accent transition-colors" />
+                      <Download className="w-8 h-8 text-accent/50 group-hover:text-accent group-hover:translate-y-1 transition-all" />
                     </div>
                   </a>
-                )}
-              </div>
+
+                  {/* Optional Video Download (Secondary) */}
+                  {currentJob.overlay && (
+                    <a
+                      href={`${API_BASE_URL}/download/video/${currentJob.job_id}`}
+                      className="group flex items-center justify-between p-8 rounded-[2.5rem] bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-500"
+                    >
+                      <div className="flex items-center space-x-6">
+                        <div className="p-4 rounded-3xl bg-white/5 group-hover:bg-white/10 transition-colors">
+                          <Video className="w-8 h-8 text-white/60" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-xl text-white/80">Captioned Video</p>
+                          <p className="text-sm text-white/30">Optional MP4 with Overlay</p>
+                        </div>
+                      </div>
+                      <Download className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
+                    </a>
+                  )}
+                </div>
+              )}
               
               <button 
                 onClick={reset}

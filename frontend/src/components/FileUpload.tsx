@@ -46,26 +46,29 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            {...getRootProps()}
-            className={`cursor-pointer group relative overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-300 ${
-              isDragActive 
-                ? 'border-accent bg-accent/5' 
-                : 'border-white/10 hover:border-white/20 hover:bg-white/5'
-            }`}
           >
-            <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-4">
-              <div className="p-4 rounded-2xl bg-white/5 group-hover:bg-white/10 transition-colors">
-                <Upload className="w-8 h-8 text-accent group-hover:scale-110 transition-transform" />
+            <div
+              {...getRootProps()}
+              className={`cursor-pointer group relative overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-300 ${
+                isDragActive 
+                  ? 'border-accent bg-accent/5' 
+                  : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+              }`}
+            >
+              <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-4">
+                <div className="p-4 rounded-2xl bg-white/5 group-hover:bg-white/10 transition-colors">
+                  <Upload className="w-8 h-8 text-accent group-hover:scale-110 transition-transform" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xl font-medium text-white">
+                    Drop your video here
+                  </p>
+                  <p className="text-white/50 text-sm">
+                    Support MP4 and MOV formats (Max 500MB)
+                  </p>
+                </div>
+                <input {...getInputProps()} />
               </div>
-              <div className="space-y-2">
-                <p className="text-xl font-medium text-white">
-                  Drop your video here
-                </p>
-                <p className="text-white/50 text-sm">
-                  Support MP4 and MOV formats (Max 500MB)
-                </p>
-              </div>
-              <input {...getInputProps()} />
             </div>
           </motion.div>
         ) : (
@@ -99,22 +102,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
             </div>
 
             <div className="mt-8 space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="space-y-1">
-                  <p className="font-medium text-white">Overlay Captions</p>
-                  <p className="text-xs text-white/40">Directly embed Amharic text into video</p>
-                </div>
-                <button
-                  onClick={() => setOverlay(!overlay)}
-                  className={`w-12 h-6 rounded-full transition-all duration-300 relative ${
-                    overlay ? 'bg-accent' : 'bg-white/10'
-                  }`}
-                >
-                  <motion.div
-                    animate={{ x: overlay ? 26 : 4 }}
-                    className="absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow-lg"
-                  />
-                </button>
+              {/* Video Overlay option - Hidden by default as per user request for SRT-only focus */}
+              <div className="hidden">
+                 <button onClick={() => setOverlay(!overlay)} />
               </div>
 
               <button
