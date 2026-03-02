@@ -55,8 +55,156 @@ body {
 }
 
 .premium-gradient {
-  background: radial-gradient(circle at center, #111 0%, #050505 100%);
+  background: #050505;
+  position: relative;
 }
+
+/* Gemini-style flowing background */
+.gemini-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gemini-bg::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: 
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(59, 130, 246, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 10% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 90% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 60%);
+  animation: geminiBgShift 16s ease-in-out infinite alternate;
+}
+
+.gemini-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  animation: orbFloat 0s ease-in-out infinite;
+}
+
+.gemini-orb-1 {
+  width: 55vw;
+  height: 55vw;
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.22) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 70%);
+  animation: orbFloat1 18s ease-in-out infinite;
+}
+
+.gemini-orb-2 {
+  width: 50vw;
+  height: 50vw;
+  top: 10%;
+  right: -15%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.07) 50%, transparent 70%);
+  animation: orbFloat2 22s ease-in-out infinite;
+}
+
+.gemini-orb-3 {
+  width: 45vw;
+  height: 45vw;
+  bottom: -10%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(59, 130, 246, 0.06) 50%, transparent 70%);
+  animation: orbFloat3 26s ease-in-out infinite;
+}
+
+.gemini-orb-4 {
+  width: 35vw;
+  height: 35vw;
+  top: 40%;
+  left: -5%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  animation: orbFloat4 20s ease-in-out infinite;
+}
+
+.gemini-orb-5 {
+  width: 40vw;
+  height: 40vw;
+  bottom: 5%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(139, 92, 246, 0.06) 50%, transparent 70%);
+  animation: orbFloat5 24s ease-in-out infinite;
+}
+
+@keyframes geminiBgShift {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  25%  { transform: translate(3%, -4%) scale(1.04); }
+  50%  { transform: translate(-4%, 3%) scale(0.97); }
+  75%  { transform: translate(2%, 5%) scale(1.03); }
+  100% { transform: translate(-3%, -2%) scale(1.01); }
+}
+
+@keyframes orbFloat1 {
+  0%   { opacity: 1; transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(8%, 12%) scale(1.08); }
+  66%  { transform: translate(-5%, 6%) scale(0.94); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orbFloat2 {
+  0%   { opacity: 1; transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(-10%, 8%) scale(1.1); }
+  66%  { transform: translate(6%, -10%) scale(0.92); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orbFloat3 {
+  0%   { opacity: 1; transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(12%, -8%) scale(1.06); }
+  66%  { transform: translate(-8%, -5%) scale(1.12); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orbFloat4 {
+  0%   { opacity: 1; transform: translate(0%, 0%) scale(1); }
+  50%  { transform: translate(15%, -15%) scale(1.15); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orbFloat5 {
+  0%   { opacity: 1; transform: translate(0%, 0%) scale(1); }
+  40%  { transform: translate(-12%, 10%) scale(0.9); }
+  80%  { transform: translate(8%, -8%) scale(1.1); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+/* Shimmer highlight line — like Gemini's animated top border */
+.gemini-shimmer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.0) 10%,
+    rgba(99, 102, 241, 0.8) 30%,
+    rgba(139, 92, 246, 0.9) 50%,
+    rgba(6, 182, 212, 0.8) 70%,
+    rgba(59, 130, 246, 0.0) 90%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSlide 4s linear infinite;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@keyframes shimmerSlide {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+
 
 .glow {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);

@@ -104,10 +104,17 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen premium-gradient relative overflow-hidden flex flex-col items-center justify-center p-6 sm:p-24">
-      {/* Decorative background glow */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+    <main className="min-h-screen premium-gradient relative flex flex-col items-center justify-center p-6 sm:p-24">
+      {/* Gemini-style flowing background */}
+      <div className="gemini-bg">
+        <div className="gemini-orb gemini-orb-1" />
+        <div className="gemini-orb gemini-orb-2" />
+        <div className="gemini-orb gemini-orb-3" />
+        <div className="gemini-orb gemini-orb-4" />
+        <div className="gemini-orb gemini-orb-5" />
+      </div>
+      {/* Animated shimmer line at the very top */}
+      <div className="gemini-shimmer" />
 
       <div className="w-full max-w-4xl z-10 space-y-12">
         {/* Header */}
