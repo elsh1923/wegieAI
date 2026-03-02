@@ -8,7 +8,6 @@ import {
   Download, 
   CheckCircle2, 
   AlertCircle, 
-  Sparkles, 
   Clock, 
   Video, 
   FileType,
@@ -115,15 +114,52 @@ export default function Home() {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4"
+          className="text-center space-y-6"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass border border-white/10 text-accent text-sm font-medium mb-4 glow">
-            <Sparkles className="w-4 h-4" />
-            <span>AI-Powered Captioning</span>
+          {/* Wegie Logo */}
+          <div className="flex items-center justify-center">
+            <svg viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg" className="h-20 sm:h-28 w-auto drop-shadow-2xl">
+              <defs>
+                <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3b82f6"/>
+                  <stop offset="40%" stopColor="#06b6d4"/>
+                  <stop offset="70%" stopColor="#f59e0b"/>
+                  <stop offset="100%" stopColor="#ef4444"/>
+                </linearGradient>
+                <linearGradient id="bubbleGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.3"/>
+                  <stop offset="100%" stopColor="#f97316" stopOpacity="0.15"/>
+                </linearGradient>
+              </defs>
+
+              {/* Speech bubble body */}
+              <rect x="6" y="6" width="108" height="82" rx="28" ry="28" fill="url(#bubbleGrad)"/>
+              {/* Bubble tail */}
+              <polygon points="28,88 18,110 52,88" fill="url(#bubbleGrad)"/>
+              {/* Shine overlay */}
+              <rect x="6" y="6" width="108" height="82" rx="28" ry="28" fill="url(#bubbleGrad2)"/>
+
+              {/* Play triangle */}
+              <polygon points="36,30 36,68 68,49" fill="white" opacity="0.95"/>
+
+              {/* Waveform bars */}
+              <rect x="76" y="38" width="7" height="22" rx="3.5" fill="white" opacity="0.95"/>
+              <rect x="88" y="29" width="7" height="40" rx="3.5" fill="white" opacity="0.95"/>
+              <rect x="100" y="36" width="7" height="26" rx="3.5" fill="white" opacity="0.95"/>
+
+              {/* "Wegie" wordmark */}
+              <text
+                x="136"
+                y="78"
+                fontFamily="'Inter', 'Segoe UI', system-ui, sans-serif"
+                fontWeight="700"
+                fontSize="62"
+                fill="#f1f5f9"
+                letterSpacing="-1"
+              >Wegie</text>
+            </svg>
           </div>
-          <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white">
-            Amharic <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-blue-400">Captions</span>
-          </h1>
+
           <p className="text-white/50 text-xl max-w-xl mx-auto font-light leading-relaxed">
             Automatically generate accurate Amharic subtitles for your videos in seconds.
           </p>

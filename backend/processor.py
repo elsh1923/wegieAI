@@ -77,7 +77,7 @@ def process_video(job_id: str, input_path: str, overlay: bool = False):
         jobs[job_id]["status"] = "transcribing"
         print(f"DEBUG: Uploading audio to Gemini for job {job_id}")
         
-        audio_file = client.files.upload(file=audio_path, mime_type="audio/mp3")
+        audio_file = client.files.upload(file=audio_path)
         
         print(f"DEBUG: Starting Gemini transcription for job {job_id}")
         
