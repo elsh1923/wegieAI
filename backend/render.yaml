@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: amharic-caption-backend
+    env: docker
+    plan: free # Change to a paid plan if you need more resources
+    region: oregon # or your preferred region
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false # Set this in the Render dashboard
+      - key: PORT
+        value: 8000
+    # Enable persistence if you want to keep files between restarts
+    # Requires a paid plan on Render
+    # disk:
+    #   name: data
+    #   mountPath: /app/output
+    #   sizeGB: 1

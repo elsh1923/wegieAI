@@ -4,3 +4,5 @@ python-multipart
 moviepy
 google-generativeai
 python-dotenv
+gunicorn
+srt

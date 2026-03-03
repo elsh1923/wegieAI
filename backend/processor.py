@@ -23,20 +23,24 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
-_ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-_ffmpeg_dir = os.path.dirname(_ffmpeg_exe)
-_target_ffmpeg = os.path.join(_ffmpeg_dir, "ffmpeg.exe")
+if os.name == 'nt':
+    _ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    _ffmpeg_dir = os.path.dirname(_ffmpeg_exe)
+    _target_ffmpeg = os.path.join(_ffmpeg_dir, "ffmpeg.exe")
 
-# Whisper/ffmpeg-python looks for "ffmpeg.exe", not the versioned name from imageio-ffmpeg
-if not os.path.exists(_target_ffmpeg):
-    try:
-        shutil.copy2(_ffmpeg_exe, _target_ffmpeg)
-    except Exception as e:
-        print(f"Warning: Could not create ffmpeg alias: {e}")
+    # Whisper/ffmpeg-python looks for "ffmpeg.exe", not the versioned name from imageio-ffmpeg
+    if not os.path.exists(_target_ffmpeg):
+        try:
+            shutil.copy2(_ffmpeg_exe, _target_ffmpeg)
+        except Exception as e:
+            print(f"Warning: Could not create ffmpeg alias: {e}")
 
-# Inject into PATH so all sub-processes (Whisper, MoviePy) find it
-os.environ["PATH"] = _ffmpeg_dir + os.pathsep + os.environ.get("PATH", "")
-os.environ["FFMPEG_BINARY"] = _target_ffmpeg
+    # Inject into PATH so all sub-processes (Whisper, MoviePy) find it
+    os.environ["PATH"] = _ffmpeg_dir + os.pathsep + os.environ.get("PATH", "")
+    os.environ["FFMPEG_BINARY"] = _target_ffmpeg
+else:
+    # On Linux/Render, we'll rely on system-installed FFmpeg
+    os.environ["FFMPEG_BINARY"] = "ffmpeg"
 
 from moviepy import VideoFileClip, CompositeVideoClip, TextClip
 from state import jobs, UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR
@@ -109,11 +113,12 @@ def process_video(job_id: str, input_path: str, overlay: bool = False):
             jobs[job_id]["status"] = "overlaying_captions"
             subtitle_clips = []
             for sub in srt_subtitles:
-                # Use Segoe UI which has excellent Amharic support on Windows
+                # Use Segoe UI on Windows, Noto Sans Ethiopic on Linux
+                font_name = "Segoe UI" if os.name == 'nt' else "Noto-Sans-Ethiopic"
                 txt_clip = (
                     TextClip(
                         text=sub.content,
-                        font="Segoe UI",
+                        font=font_name,
                         font_size=32,
                         color='white',
                         bg_color='rgba(0,0,0,0.6)',

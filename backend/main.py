@@ -14,7 +14,8 @@ app = FastAPI(title="Amharic Video Captioning API")
 # Enable CORS for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Allow all origins for initial deployment ease
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
