@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
 
 # Fix ImageMagick policy to allow MoviePy to use it
 # By default, ImageMagick blocks certain operations for security.
-RUN sed -i 's/domain="path" rights="none" pattern="@\*"/domain="path" rights="read|write" pattern="@\*"/g' /etc/ImageMagick-6/policy.xml
+# We use find to locate policy.xml as the version/path might vary.
+RUN find /etc -name policy.xml -exec sed -i 's/domain="path" rights="none" pattern="@\*"/domain="path" rights="read|write" pattern="@\*"/g' {} +
 
 # Copy the requirements file into the container
 COPY requirements.txt .
