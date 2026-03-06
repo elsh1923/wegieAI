@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileVideo, X, CheckCircle2, Loader2, Music } from 'lucide-react';
+import { Upload, FileVideo, X, CheckCircle2, Loader2, Music, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FileUploadProps {
