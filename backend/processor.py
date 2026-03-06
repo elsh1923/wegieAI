@@ -105,8 +105,8 @@ def process_media(job_id: str, input_path: str, overlay: bool = False):
         
         prompt = "Transcribe the audio."
         
-        # We try multiple model names in case one is busy (503) or unavailable (404)
-        models_to_try = ['gemini-flash-latest', 'gemini-1.5-flash', 'gemini-1.5-flash-002']
+        # Use only confirmed available model names to avoid 404 errors
+        models_to_try = ['gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.0-flash']
         response = None
         last_error = None
 
