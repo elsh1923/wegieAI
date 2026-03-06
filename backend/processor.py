@@ -9,8 +9,12 @@ from datetime import timedelta
 
 # Load API key
 load_dotenv()
-api_key = os.environ.get("GOOGLE_API_KEY")
-client = genai.Client(api_key=api_key) if api_key else genai.Client()
+
+def get_client():
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        return None
+    return genai.Client(api_key=api_key)
 
 # --- Configure ffmpeg path before everything else ---
 import imageio_ffmpeg
@@ -91,14 +95,19 @@ def process_media(job_id: str, input_path: str, overlay: bool = False):
         jobs[job_id]["status"] = "transcribing"
         print(f"DEBUG: Uploading audio to Gemini for job {job_id}")
         
+        client = get_client()
+        if not client:
+            raise ValueError("GOOGLE_API_KEY is not set. Please set it in your environment variables.")
+            
         audio_file = client.files.upload(file=audio_path)
         
         print(f"DEBUG: Starting Gemini transcription for job {job_id}")
         
         prompt = "Transcribe the audio."
         
+        # Using Gemini 1.5 Flash (correcting typo from 2.5)
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-1.5-flash',
             contents=[audio_file, prompt],
             config=generation_config
         )

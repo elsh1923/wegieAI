@@ -45,7 +45,7 @@ prompt = "Transcribe the audio."
 
 print("Starting generation...")
 response = client.models.generate_content(
-    model='gemini-2.5-flash',
+    model='gemini-1.5-flash',
     contents=[audio_obj, prompt],
     config=generation_config
 )
