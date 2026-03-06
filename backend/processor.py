@@ -105,13 +105,29 @@ def process_media(job_id: str, input_path: str, overlay: bool = False):
         
         prompt = "Transcribe the audio."
         
-        # Using gemini-flash-latest (as gemini-1.5-flash was unavailable in this account/region)
-        response = client.models.generate_content(
-            model='gemini-flash-latest',
-            contents=[audio_file, prompt],
-            config=generation_config
-        )
-        print(f"DEBUG: Transcription completed for job {job_id}")
+        # We try multiple model names in case one is busy (503) or unavailable (404)
+        models_to_try = ['gemini-flash-latest', 'gemini-1.5-flash', 'gemini-1.5-flash-002']
+        response = None
+        last_error = None
+
+        for model_name in models_to_try:
+            try:
+                print(f"DEBUG: Trying model {model_name} for job {job_id}")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[audio_file, prompt],
+                    config=generation_config
+                )
+                if response and response.text:
+                    print(f"DEBUG: Transcription completed using {model_name}")
+                    break
+            except Exception as e:
+                last_error = e
+                print(f"Warning: Model {model_name} failed: {str(e)}")
+                continue
+        
+        if not response:
+            raise last_error or ValueError("All Gemini models failed to respond. Please try again in top a few minutes.")
         
         srt_content = response.text.strip()
         
