@@ -127,7 +127,15 @@ def process_media(job_id: str, input_path: str, overlay: bool = False):
                 continue
         
         if not response:
-            raise last_error or ValueError("All Gemini models failed to respond. Please try again in top a few minutes.")
+            error_msg = str(last_error)
+            if "503" in error_msg or "UNAVAILABLE" in error_msg:
+                friendly_error = "Gemini is currently very busy (overloaded). Please try again in a few minutes."
+            elif "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                friendly_error = "Daily limit reached for this API key. Please try again tomorrow or use a different key."
+            else:
+                friendly_error = f"Transcription failed: {error_msg if len(error_msg) < 100 else 'Internal AI error'}"
+            
+            raise ValueError(friendly_error)
         
         srt_content = response.text.strip()
         

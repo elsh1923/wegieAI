@@ -289,7 +289,10 @@ export default function Home() {
                 <AlertCircle className="w-8 h-8" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  {currentJob?.error?.includes('busy') ? 'AI is Busy' : 
+                   currentJob?.error?.includes('limit') ? 'Limit Reached' : 'Something went wrong'}
+                </h2>
                 <p className="text-white/40 max-w-sm mx-auto">
                   {currentJob?.error || "We couldn't process your media. Please try again or check the file format."}
                 </p>
