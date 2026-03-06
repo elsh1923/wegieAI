@@ -30,6 +30,7 @@ export default function Home() {
   const [status, setStatus] = useState<JobStatus>('idle');
   const [currentJob, setCurrentJob] = useState<Job | null>(null);
   const [detailStatus, setDetailStatus] = useState<string>('');
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   // Polling for job status
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function Home() {
           const data = response.data;
           
           if (data && data.status) {
-            setDetailStatus(String(data.status).replace('_', ' '));
+            setDetailStatus(String(data.status).replace(/_/g, ' '));
           }
 
           if (data.status === 'completed') {
@@ -61,8 +62,12 @@ export default function Home() {
           }
         } catch (error) {
           console.error('Polling error:', error);
+          // Don't stop polling on minor network glitches unless it's a 4xx error
+          if (axios.isAxiosError(error) && error.response?.status && error.response.status >= 400 && error.response.status < 500) {
+             clearInterval(interval);
+          }
         }
-      }, 2000);
+      }, 3000); // Polling every 3s for large files
     }
 
     return () => clearInterval(interval);
@@ -71,12 +76,25 @@ export default function Home() {
   const handleUpload = async (file: File, overlay: boolean) => {
     setStatus('uploading');
     setDetailStatus('uploading media');
+    setUploadProgress(0);
 
     const formData = new FormData();
     formData.append('file', file);
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/upload?overlay=${overlay}`, formData);
+      // Increase timeout for large files to 10 minutes (600,000ms)
+      const response = await axios.post(`${API_BASE_URL}/upload?overlay=${overlay}`, formData, {
+        timeout: 600000,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+            if (percentCompleted === 100) {
+              setDetailStatus('waiting for server to receive');
+            }
+          }
+        }
+      });
       
       setCurrentJob({
         job_id: response.data.job_id,
@@ -85,14 +103,16 @@ export default function Home() {
         overlay: overlay
       });
       setStatus('processing');
+      setDetailStatus('queued for processing');
     } catch (error: any) {
       console.error('Upload error:', error);
       setStatus('failed');
+      const errorDetail = error.response?.data?.detail || error.message || 'Upload failed';
       setCurrentJob({
         job_id: 'error',
         status: 'failed',
         filename: file.name,
-        error: error.response?.data?.detail || 'Upload failed'
+        error: errorDetail === 'timeout of 600000ms exceeded' ? 'Upload timed out. The file might be too large for your internet connection.' : errorDetail
       });
     }
   };
@@ -101,6 +121,7 @@ export default function Home() {
     setStatus('idle');
     setCurrentJob(null);
     setDetailStatus('');
+    setUploadProgress(0);
   };
 
   return (
@@ -192,16 +213,24 @@ export default function Home() {
                 >
                   <div className="flex items-center space-x-3 text-white/60">
                     <Clock className="w-4 h-4 animate-pulse text-accent" />
-                    <span className="capitalize">{detailStatus}...</span>
+                    <span className="capitalize">
+                      {status === 'uploading' ? `Uploading (${uploadProgress}%)` : detailStatus}...
+                    </span>
                   </div>
-                  <div className="w-64 h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-64 h-2 bg-white/5 rounded-full overflow-hidden">
                     <motion.div 
                       className="h-full bg-accent glow"
                       initial={{ width: "0%" }}
-                      animate={{ width: "100%" }}
-                      transition={{ duration: 15, ease: "linear" }}
+                      animate={{ width: status === 'uploading' ? `${uploadProgress}%` : "100%" }}
+                      transition={{ 
+                        duration: status === 'uploading' ? 0.3 : 30, 
+                        ease: status === 'uploading' ? "easeOut" : "linear" 
+                      }}
                     />
                   </div>
+                  {status === 'processing' && (
+                     <p className="text-white/20 text-xs animate-pulse">Large files may take 1-3 minutes to transcribe</p>
+                  )}
                 </motion.div>
               )}
             </motion.div>
