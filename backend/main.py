@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 import processor
 from state import jobs, UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR
 
-app = FastAPI(title="Amharic Video Captioning API")
+app = FastAPI(title="Wege API")
 
 # Enable CORS for frontend integration
 app.add_middleware(

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: amharic-caption-backend
+    name: wege-backend
     env: docker
     plan: free # Change to a paid plan if you need more resources
     region: oregon # or your preferred region
