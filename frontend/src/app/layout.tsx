@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Amharic Video Captioning",
+  title: "Wegie ወጌ - Amharic Video Captioning",
   description: "AI-powered Amharic subtitles for your videos",
 };
 

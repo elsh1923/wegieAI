@@ -184,7 +184,7 @@ export default function Home() {
                 fontSize="62"
                 fill="#f1f5f9"
                 letterSpacing="-1"
-              >Wege</text>
+              >Wegie ወጌ</text>
             </svg>
           </div>
 

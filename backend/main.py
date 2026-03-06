@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 import processor
 from state import jobs, UPLOAD_DIR, AUDIO_DIR, CAPTION_DIR, OUTPUT_DIR
 
-app = FastAPI(title="Wege API")
+app = FastAPI(title="Wegie API")
 
 # Enable CORS for frontend integration
 app.add_middleware(
@@ -19,6 +19,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Wegie ወጌ API", "status": "running", "docs": "/docs"}
 
 @app.post("/upload")
 async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...), overlay: bool = False):
