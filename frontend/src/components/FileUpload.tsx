@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileVideo, X, CheckCircle2, Loader2, Music, AlertCircle } from 'lucide-react';
+import { Upload, FileVideo, X, CheckCircle2, Loader2, Music, CircleAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FileUploadProps {
@@ -132,7 +132,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
                   animate={{ opacity: 1, height: 'auto' }}
                   className="flex items-start space-x-3 p-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-200/80 text-sm"
                 >
-                  <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                  <CircleAlert className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
                   <p>
                     This is a large file. High-resolution videos might take longer to upload and process. For faster results, consider using audio-only files.
                   </p>
