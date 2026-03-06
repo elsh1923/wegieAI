@@ -1,7 +1,8 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
 moviepy
+imageio-ffmpeg
 google-genai
 python-dotenv
 gunicorn
