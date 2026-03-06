@@ -21,9 +21,13 @@ app.add_middleware(
 )
 
 @app.post("/upload")
-async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = File(...), overlay: bool = False):
-    if not file.filename.lower().endswith(('.mp4', '.mov')):
-        raise HTTPException(status_code=400, detail="Invalid file format. Only MP4 and MOV allowed.")
+async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...), overlay: bool = False):
+    allowed_video = ('.mp4', '.mov')
+    allowed_audio = ('.mp3', '.wav', '.m4a', '.aac', '.flac')
+    
+    filename_lower = file.filename.lower()
+    if not (filename_lower.endswith(allowed_video) or filename_lower.endswith(allowed_audio)):
+        raise HTTPException(status_code=400, detail="Invalid file format. Supported: MP4, MOV, MP3, WAV, M4A, AAC, FLAC.")
     
     job_id = str(uuid.uuid4())
     file_ext = os.path.splitext(file.filename)[1]
@@ -35,7 +39,7 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
     jobs[job_id] = {"status": "queued", "filename": file.filename, "overlay": overlay}
     
     # Start async processing
-    background_tasks.add_task(processor.process_video, job_id, input_path, overlay)
+    background_tasks.add_task(processor.process_media, job_id, input_path, overlay)
     
     return {"job_id": job_id, "status": "queued"}
 

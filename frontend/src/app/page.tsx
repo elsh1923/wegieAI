@@ -70,7 +70,7 @@ export default function Home() {
 
   const handleUpload = async (file: File, overlay: boolean) => {
     setStatus('uploading');
-    setDetailStatus('uploading video');
+    setDetailStatus('uploading media');
 
     const formData = new FormData();
     formData.append('file', file);
@@ -168,7 +168,7 @@ export default function Home() {
           </div>
 
           <p className="text-white/50 text-xl max-w-xl mx-auto font-light leading-relaxed">
-            Automatically generate accurate Amharic subtitles for your videos in seconds.
+            Automatically generate accurate Amharic subtitles for your videos and audio in seconds.
           </p>
         </motion.div>
 
@@ -274,7 +274,7 @@ export default function Home() {
                 onClick={reset}
                 className="w-full flex items-center justify-center space-x-2 text-white/40 hover:text-accent transition-colors"
               >
-                <span>Upload another video</span>
+                <span>Upload another file</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </motion.div>
@@ -291,7 +291,7 @@ export default function Home() {
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
                 <p className="text-white/40 max-w-sm mx-auto">
-                  {currentJob?.error || "We couldn't process your video. Please try again or check the file format."}
+                  {currentJob?.error || "We couldn't process your media. Please try again or check the file format."}
                 </p>
               </div>
               <button
@@ -311,7 +311,7 @@ export default function Home() {
           transition={{ delay: 0.5 }}
           className="text-center text-white/20 text-sm font-light"
         >
-          Integrated with OpenAI Whisper • Processing Amharic Language
+          Integrated with Google Gemini • Processing Amharic Language
         </motion.p>
       </div>
     </main>

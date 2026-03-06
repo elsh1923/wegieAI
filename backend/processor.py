@@ -66,16 +66,26 @@ generation_config = types.GenerateContentConfig(
 )
 
 
-def process_video(job_id: str, input_path: str, overlay: bool = False):
+def process_media(job_id: str, input_path: str, overlay: bool = False):
     video = None
     try:
-        # 1. Update status
-        jobs[job_id]["status"] = "extracting_audio"
+        file_ext = os.path.splitext(input_path)[1].lower()
+        is_audio = file_ext in ('.mp3', '.wav', '.m4a', '.aac', '.flac')
         
-        # 2. Extract Audio
-        audio_path = os.path.join(AUDIO_DIR, f"{job_id}.mp3")
-        video = VideoFileClip(input_path)
-        video.audio.write_audiofile(audio_path)
+        # 1. Update status
+        if is_audio:
+            jobs[job_id]["status"] = "preparing_audio"
+            jobs[job_id]["type"] = "audio"
+            audio_path = os.path.join(AUDIO_DIR, f"{job_id}{file_ext}")
+            shutil.copy2(input_path, audio_path)
+            if overlay:
+                print(f"Warning: Overlay requested for audio-only job {job_id}. Ignoring overlay.")
+        else:
+            jobs[job_id]["status"] = "extracting_audio"
+            jobs[job_id]["type"] = "video"
+            audio_path = os.path.join(AUDIO_DIR, f"{job_id}.mp3")
+            video = VideoFileClip(input_path)
+            video.audio.write_audiofile(audio_path)
         
         # 3. Upload to Gemini and Transcribe
         jobs[job_id]["status"] = "transcribing"
@@ -109,7 +119,7 @@ def process_video(job_id: str, input_path: str, overlay: bool = False):
         srt_subtitles = list(srt.parse(srt_content))
         
         # 4.5 Optional Overlay
-        if overlay:
+        if overlay and not is_audio:
             jobs[job_id]["status"] = "overlaying_captions"
             subtitle_clips = []
             for sub in srt_subtitles:

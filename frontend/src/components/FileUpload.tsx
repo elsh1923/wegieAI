@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileVideo, X, CheckCircle2, Loader2 } from 'lucide-react';
+import { Upload, FileVideo, X, CheckCircle2, Loader2, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FileUploadProps {
@@ -25,6 +25,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
     accept: {
       'video/mp4': ['.mp4'],
       'video/quicktime': ['.mov'],
+      'audio/mpeg': ['.mp3'],
+      'audio/wav': ['.wav'],
+      'audio/x-m4a': ['.m4a'],
+      'audio/aac': ['.aac'],
+      'audio/flac': ['.flac'],
     },
     multiple: false,
   });
@@ -61,10 +66,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-xl font-medium text-white">
-                    Drop your video here
+                    Drop your media here
                   </p>
                   <p className="text-white/50 text-sm">
-                    Support MP4 and MOV formats (Max 500MB)
+                    Support Video (MP4, MOV) and Audio (MP3, WAV, M4A)
                   </p>
                 </div>
                 <input {...getInputProps()} />
@@ -81,7 +86,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUpload, status }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 rounded-xl bg-accent/20">
-                  <FileVideo className="w-6 h-6 text-accent" />
+                  {file.type.startsWith('video/') ? (
+                    <FileVideo className="w-6 h-6 text-accent" />
+                  ) : (
+                    <Music className="w-6 h-6 text-accent" />
+                  )}
                 </div>
                 <div>
                   <p className="text-white font-medium truncate max-w-[200px]">
