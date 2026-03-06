@@ -4,8 +4,8 @@ services:
     env: docker
     plan: free # Change to a paid plan if you need more resources
     region: oregon # or your preferred region
-    dockerContext: .
-    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: GOOGLE_API_KEY
         sync: false # Set this in the Render dashboard
