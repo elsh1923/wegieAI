@@ -105,9 +105,9 @@ def process_media(job_id: str, input_path: str, overlay: bool = False):
         
         prompt = "Transcribe the audio."
         
-        # Using Gemini 1.5 Flash (correcting typo from 2.5)
+        # Using gemini-flash-latest (as gemini-1.5-flash was unavailable in this account/region)
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=[audio_file, prompt],
             config=generation_config
         )
